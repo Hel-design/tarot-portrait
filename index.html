@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Психологический портрет Таро</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f6f7f9;
+      padding: 20px;
+      color: #222;
+    }
+    .container {
+      max-width: 1300px;
+      margin: auto;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .controls {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .controls input, .controls button {
+      padding: 10px;
+      margin: 5px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    .controls input[type="number"] {
+      width: 70px;
+      text-align: center;
+    }
+    .section {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 40px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      display: none;
+    }
+    .section-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 8px 16px;
+      text-align: center;
+      width: 100px;
+      display: inline-block;
+      margin: 8px 24px;
+    }
+    .label {
+      font-size: 12px;
+      color: #777;
+      margin-bottom: 4px;
+    }
+    .value {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .formula {
+      font-size: 12px;
+      color: #555;
+      margin-top: 4px;
+    }
+    .row {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin: 40px 0;
+      flex-wrap: wrap;
+    }
+    .spread {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .spread .side {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+    }
+    .spread .center {
+      flex: 2;
+      display: flex;
+      justify-content: center;
+      gap: 80px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Психологический портрет по арканам Таро</h1>
+  <div class="controls">
+    <label>Дата рождения:</label>
+    <input type="number" id="day" placeholder="ДД" min="1" max="31" oninput="this.value=this.value.slice(0,2);">
+    <input type="number" id="month" placeholder="MM" min="1" max="12" oninput="this.value=this.value.slice(0,2);">
+    <input type="number" id="year" placeholder="ГГГГ" min="1900" max="2099" oninput="this.value=this.value.slice(0,4);">
+    <button onclick="calculate()">Посчитать</button>
+  </div>
+
+  <div id="triangle-section" class="section triangle-layout">
+    <div class="spread">
+      <div class="side"><div id="pos13"></div></div>
+      <div class="center"><div class="section-title">Основные позиции</div></div>
+      <div class="side"><div id="pos14"></div></div>
+    </div>
+    <div class="spread">
+      <div class="side"><div id="pos12"></div></div>
+      <div class="row" id="row1"></div>
+      <div class="side"><div id="pos7"></div></div>
+    </div>
+    <div class="row" id="row2"></div>
+    <div class="row" id="row3"></div>
+    <div class="row" id="row4"></div>
+  </div>
+
+  <div id="others-section" class="section section-others">
+    <div class="section-title">Отдельные позиции</div>
+    <div class="row" id="col-left"></div>
+    <div class="row" id="col-right"></div>
+  </div>
+
+  <div id="subcon-section" class="section section-subcon">
+    <div class="section-title">Подсознание</div>
+    <div class="row" id="rowA"></div>
+    <div class="row" id="rowBC"></div>
+    <div class="row" id="rowDEF"></div>
+    <div class="row" id="rowH"></div>
+  </div>
+</div>
+
+<script>
+function toRoman(num) {
+  const roman = ['0','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI','XVII','XVIII','XIX','XX','XXI','XXII'];
+  return roman[num] || num;
+}
+
+function createCard(pos, val, formula) {
+  return `<div class='card'><div class='label'>${pos}</div><div class='value'>${toRoman(val)}</div><div class='formula'>${formula}</div></div>`;
+}
+
+function sumDigits(n) {
+  return n.toString().split('').reduce((a,b)=>a+parseInt(b),0);
+}
+
+function mod22(n) {
+  while (n > 22) n -= 22;
+  return n === 0 ? 22 : n;
+}
+
+function calculate() {
+  const day = parseInt(document.getElementById("day").value);
+  const month = parseInt(document.getElementById("month").value);
+  const year = parseInt(document.getElementById("year").value);
+  if (!day || !month || !year) return;
+
+  const pos1 = mod22(day);
+  const pos2 = mod22(month);
+  const sumY = sumDigits(year);
+  const pos3 = mod22(sumY);
+  const pos4 = mod22(pos1 + pos2);
+  const pos5 = mod22(pos2 + pos3);
+  const pos6 = mod22(pos4 + pos5);
+  const pos7 = mod22(pos4 + pos3);
+  const pos8 = mod22(pos2 + pos6);
+  const pos12 = mod22(pos4 + pos5 + pos6);
+  const pos13 = mod22(pos1 + pos4 + pos6);
+  const pos14 = mod22(pos3 + pos5 + pos6);
+
+  const pos9  = mod22(Math.abs(pos1 - pos2));
+  const pos10 = mod22(Math.abs(pos2 - pos3));
+  const pos11 = mod22(Math.abs(pos9 - pos10));
+  const pos15 = mod22(pos9 + pos10 + pos11);
+  const pos16 = mod22(pos1 + pos3 + pos4 + pos5);
+  const pos17 = mod22(pos6 + pos11);
+  const pos18 = mod22(pos8 + pos11);
+  const pos19 = mod22(pos4 + pos6);
+  const pos20 = mod22(pos5 + pos6);
+  const pos21 = mod22(pos1 + pos2 + pos3 + pos4 + pos5 + pos6);
+
+  const posA = mod22(pos1 + pos4);
+  const posB = mod22(pos2 + pos4);
+  const posC = mod22(pos2 + pos5);
+  const posD = mod22(pos3 + pos5);
+  const posE = mod22(pos4 + pos6);
+  const posF = mod22(pos5 + pos6);
+  const posH = mod22(pos6 + pos19);
+
+  document.getElementById("triangle-section").style.display = 'block';
+  document.getElementById("others-section").style.display = 'block';
+  document.getElementById("subcon-section").style.display = 'block';
+
+  document.getElementById("pos13").innerHTML = createCard("13", pos13, "1+4+6");
+  document.getElementById("pos14").innerHTML = createCard("14", pos14, "3+5+6");
+  document.getElementById("pos12").innerHTML = createCard("12", pos12, "4+5+6");
+  document.getElementById("pos7").innerHTML = createCard("7", pos7, "4+3");
+
+  document.getElementById("row1").innerHTML = createCard("1", pos1, "день") + createCard("2", pos2, "месяц") + createCard("3", pos3, "год");
+  document.getElementById("row2").innerHTML = createCard("4", pos4, "1+2") + createCard("5", pos5, "2+3");
+  document.getElementById("row3").innerHTML = createCard("6", pos6, "4+5");
+  document.getElementById("row4").innerHTML = createCard("8", pos8, "2+6");
+
+  document.getElementById("col-left").innerHTML = createCard("9", pos9, "|1−2|") + createCard("10", pos10, "|2−3|") + createCard("11", pos11, "|9−10|") + createCard("15", pos15, "9+10+11") + createCard("17", pos17, "6+11") + createCard("18", pos18, "8+11");
+  document.getElementById("col-right").innerHTML = createCard("16", pos16, "1+3+4+5") + createCard("19", pos19, "4+6") + createCard("20", pos20, "5+6") + createCard("21", pos21, "1+2+3+4+5+6");
+
+  document.getElementById("rowA").innerHTML = createCard("A", posA, "1+4");
+  document.getElementById("rowBC").innerHTML = createCard("B", posB, "2+4") + createCard("C", posC, "2+5");
+  document.getElementById("rowDEF").innerHTML = createCard("D", posD, "3+5") + createCard("E", posE, "4+6") + createCard("F", posF, "5+6");
+  document.getElementById("rowH").innerHTML = createCard("H", posH, "6+19");
+}
+</script>
+</body>
+</html>
